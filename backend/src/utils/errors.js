@@ -1,9 +1,9 @@
 // Custom error class for API errors
 export class ApiError extends Error {
-    constructor(message, statusCode) {
+    constructor(message, statusCode = 500) {
         super(message);
         this.statusCode = statusCode;
-        this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
+        this.status = statusCode >= 400 && statusCode < 500 ? 'fail' : 'error';
         this.isOperational = true;
 
         Error.captureStackTrace(this, this.constructor);
@@ -36,40 +36,23 @@ export const handleJWTExpiredError = () =>
 
 // Global error handler middleware
 export const globalErrorHandler = (err, req, res, next) => {
-    err.statusCode = err.statusCode || 500;
-    err.status = err.status || 'error';
+    // Ensure statusCode is a valid HTTP status code
+    const statusCode = err.statusCode && err.statusCode >= 100 && err.statusCode < 600 
+        ? err.statusCode 
+        : 500;
 
+    // Format error message
+    const error = {
+        message: err.isOperational ? err.message : 'Something went wrong!'
+    };
+
+    // Add stack trace in development
     if (process.env.NODE_ENV === 'development') {
-        res.status(err.statusCode).json({
-            success: false,
-            error: {
-                status: err.status,
-                message: err.message,
-                stack: err.stack,
-                error: err
-            }
-        });
-    } else {
-        // Production mode: don't leak error details
-        if (err.isOperational) {
-            // Operational, trusted error: send message to client
-            res.status(err.statusCode).json({
-                success: false,
-                error: {
-                    status: err.status,
-                    message: err.message
-                }
-            });
-        } else {
-            // Programming or other unknown error: don't leak error details
-            console.error('ERROR 💥:', err);
-            res.status(500).json({
-                success: false,
-                error: {
-                    status: 'error',
-                    message: 'Something went wrong!'
-                }
-            });
-        }
+        error.stack = err.stack;
     }
+
+    res.status(statusCode).json({
+        success: false,
+        error
+    });
 };
