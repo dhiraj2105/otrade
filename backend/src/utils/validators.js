@@ -1,5 +1,6 @@
 import { body, param, query, validationResult } from 'express-validator';
 
+
 // Helper function to run validation rules
 export const validate = (validations) => {
     return async (req, res, next) => {
@@ -38,11 +39,62 @@ export const userValidationRules = {
     login: [
         body('email').isEmail().withMessage('Please provide a valid email'),
         body('password').notEmpty().withMessage('Password is required')
+    ],
+
+    updateDetails: [
+        body('name')
+            .optional()
+            .trim()
+            .isLength({ min: 2, max: 50 })
+            .withMessage('Name must be between 2 and 50 characters')
+            .matches(/^[a-zA-Z\s]+$/)
+            .withMessage('Name can only contain letters and spaces'),
+        body('email')
+            .optional()
+            .isEmail()
+            .withMessage('Please provide a valid email')
+            .normalizeEmail()
+    ],
+
+    updatePassword: [
+        body('currentPassword')
+            .notEmpty()
+            .withMessage('Current password is required'),
+        body('newPassword')
+            .isLength({ min: 6 })
+            .withMessage('New password must be at least 6 characters long')
+            .custom((value, { req }) => {
+                if (value === req.body.currentPassword) {
+                    throw new Error('New password must be different from current password');
+                }
+                return true;
+            })
+    ],
+
+    forgotPassword: [
+        body('email')
+            .isEmail()
+            .withMessage('Please provide a valid email')
+            .normalizeEmail()
     ]
 };
 
 // Event validation rules
 export const eventValidationRules = {
+    getStats: [],  // No validation needed for public stats as it takes no parameters
+
+    getById: [
+        param('id')
+            .isMongoId()
+            .withMessage('Invalid event ID format')
+    ],
+
+    delete: [
+        param('id')
+            .isMongoId()
+            .withMessage('Invalid event ID format')
+    ],
+
     create: [
         body('title')
             .trim()
@@ -86,6 +138,42 @@ export const eventValidationRules = {
             .trim()
             .isLength({ min: 10, max: 1000 })
             .withMessage('Description must be between 10 and 1000 characters')
+    ],
+
+    updatePrice: [
+        param('id')
+            .isMongoId()
+            .withMessage('Invalid event ID'),
+        body('minPrice')
+            .isFloat({ min: 0, max: 100 })
+            .withMessage('Minimum price must be between 0 and 100'),
+        body('maxPrice')
+            .isFloat({ min: 0, max: 100 })
+            .withMessage('Maximum price must be between 0 and 100')
+            .custom((value, { req }) => {
+                if (value <= req.body.minPrice) {
+                    throw new Error('Maximum price must be greater than minimum price');
+                }
+                return true;
+            })
+    ],
+
+    settle: [
+        param('id')
+            .isMongoId()
+            .withMessage('Invalid event ID'),
+        body('outcome')
+            .isIn(['yes', 'no', 'cancelled'])
+            .withMessage('Outcome must be yes, no, or cancelled'),
+        body('settlementPrice')
+            .optional()
+            .isFloat({ min: 0, max: 100 })
+            .withMessage('Settlement price must be between 0 and 100'),
+        body('reason')
+            .optional()
+            .trim()
+            .isLength({ min: 3, max: 500 })
+            .withMessage('Reason must be between 3 and 500 characters')
     ]
 };
 
@@ -148,6 +236,108 @@ export const tradeValidationRules = {
 };
 
 // Query validation rules
+// Trading engine validation rules
+export const tradingEngineValidationRules = {
+    placeOrder: [
+        body('eventId').isMongoId().withMessage('Invalid event ID'),
+        body('type').isIn(['buy', 'sell']).withMessage('Invalid order type'),
+        body('position').isIn(['yes', 'no']).withMessage('Invalid position'),
+        body('price').isFloat({ min: 0, max: 100 }).withMessage('Price must be between 0 and 100'),
+        body('amount').isFloat({ min: 1 }).withMessage('Amount must be at least 1')
+    ],
+    
+    cancelOrder: [
+        param('eventId').isMongoId().withMessage('Invalid event ID'),
+        param('orderId').isMongoId().withMessage('Invalid order ID')
+    ],
+
+    getOrderBook: [
+        param('eventId').isMongoId().withMessage('Invalid event ID'),
+        query('levels')
+            .optional()
+            .isInt({ min: 1, max: 100 })
+            .withMessage('Levels must be between 1 and 100')
+    ],
+
+    getMarketMetrics: [
+        param('eventId').isMongoId().withMessage('Invalid event ID'),
+        query('timeframe')
+            .optional()
+            .isIn(['1h', '4h', '12h', '24h', '7d'])
+            .withMessage('Invalid timeframe')
+    ],
+
+    getRecentTrades: [
+        param('eventId').isMongoId().withMessage('Invalid event ID'),
+        query('limit')
+            .optional()
+            .isInt({ min: 1, max: 100 })
+            .withMessage('Limit must be between 1 and 100')
+    ]
+};
+
+// Admin validation rules
+export const adminValidationRules = {
+    getUsers: [
+        query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+        query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+        query('status').optional().isIn(['active', 'suspended', 'inactive']).withMessage('Invalid status'),
+        query('role').optional().isIn(['user', 'admin']).withMessage('Invalid role')
+    ],
+
+    updateUser: [
+        param('id').isMongoId().withMessage('Invalid user ID'),
+        body('status').optional().isIn(['active', 'suspended', 'inactive']).withMessage('Invalid status'),
+        body('role').optional().isIn(['user', 'admin']).withMessage('Invalid role'),
+        body('balance').optional().isFloat({ min: 0 }).withMessage('Balance must be non-negative')
+    ],
+
+    getEventStats: [
+        param('id').isMongoId().withMessage('Invalid event ID'),
+        query('timeframe').optional().isIn(['1h', '4h', '12h', '24h', '7d']).withMessage('Invalid timeframe')
+    ],
+
+    updateEvent: [
+        param('id').isMongoId().withMessage('Invalid event ID'),
+        body('status').optional().isIn(['upcoming', 'active', 'trading', 'closed', 'settled'])
+            .withMessage('Invalid event status'),
+        body('minPrice').optional().isFloat({ min: 0, max: 100 })
+            .withMessage('Minimum price must be between 0 and 100'),
+        body('maxPrice').optional().isFloat({ min: 0, max: 100 })
+            .withMessage('Maximum price must be between 0 and 100')
+            .custom((value, { req }) => {
+                if (req.body.minPrice && value <= req.body.minPrice) {
+                    throw new Error('Maximum price must be greater than minimum price');
+                }
+                return true;
+            }),
+        body('description').optional().isString().trim().notEmpty()
+            .withMessage('Description cannot be empty')
+    ],
+
+    getSystemStats: [
+        query('timeframe')
+            .optional()
+            .isIn(['1h', '4h', '12h', '24h', '7d', '30d'])
+            .withMessage('Invalid timeframe'),
+        query('includeInactive')
+            .optional()
+            .isBoolean()
+            .withMessage('includeInactive must be a boolean')
+    ],
+
+    getRiskReport: [
+        query('timeframe')
+            .optional()
+            .isIn(['1h', '4h', '12h', '24h', '7d', '30d'])
+            .withMessage('Invalid timeframe'),
+        query('riskLevel')
+            .optional()
+            .isIn(['LOW', 'MODERATE', 'HIGH', 'SEVERE'])
+            .withMessage('Invalid risk level')
+    ]
+};
+
 export const queryValidationRules = {
     pagination: [
         query('page')
