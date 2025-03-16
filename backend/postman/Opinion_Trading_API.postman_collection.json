@@ -1,0 +1,837 @@
+{
+  "info": {
+    "_postman_id": "e5a23d4f-8b2b-4c2e-9a5d-8f2e3a9b4c5d",
+    "name": "Opinion Trading API",
+    "description": "API collection for Opinion Trading Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin Panel",
+      "item": [
+        {
+          "name": "Get Users List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/users?page=1&limit=10&status=active&role=user",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                },
+                {
+                  "key": "role",
+                  "value": "user"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"active\",\n    \"role\": \"user\",\n    \"balance\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/admin/users/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Event Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/events/:id/stats",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "events", ":id", "stats"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Event",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"trading\",\n    \"minPrice\": 10,\n    \"maxPrice\": 90,\n    \"description\": \"Updated event description\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/admin/events/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "events", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get System Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/stats",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Risk Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/risk-report",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "risk-report"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Trading Engine",
+      "item": [
+        {
+          "name": "Place Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"eventId\": \"event_id_here\",\n    \"type\": \"buy\",\n    \"position\": \"yes\",\n    \"price\": 65,\n    \"amount\": 100\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/trading/order",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trading", "order"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/trading/order/:eventId/:orderId",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trading", "order", ":eventId", ":orderId"],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "event_id_here"
+                },
+                {
+                  "key": "orderId",
+                  "value": "order_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order Book",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/trading/orderbook/:eventId?levels=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trading", "orderbook", ":eventId"],
+              "query": [
+                {
+                  "key": "levels",
+                  "value": "10"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Market Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/trading/metrics/:eventId",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trading", "metrics", ":eventId"],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recent Trades",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/trading/trades/:eventId?limit=50",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trading", "trades", ":eventId"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Trading Limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/trading/limits",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trading", "limits"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Trades",
+      "item": [
+        {
+          "name": "Create Trade",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"eventId\": \"event_id_here\",\n    \"type\": \"buy\",\n    \"position\": \"yes\",\n    \"amount\": 100,\n    \"price\": 65\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/trades",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Bulk Trades",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"trades\": [\n        {\n            \"eventId\": \"event_id_here\",\n            \"type\": \"buy\",\n            \"position\": \"yes\",\n            \"amount\": 50,\n            \"price\": 65\n        },\n        {\n            \"eventId\": \"event_id_here\",\n            \"type\": \"sell\",\n            \"position\": \"no\",\n            \"amount\": 75,\n            \"price\": 35\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/trades/bulk",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades", "bulk"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Trades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/trades?status=active&eventId=event_id_here&startDate=2025-01-01&endDate=2025-12-31&page=1&limit=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active"
+                },
+                {
+                  "key": "eventId",
+                  "value": "event_id_here"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-31"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trade History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/trades/history?eventId=event_id_here&page=1&limit=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades", "history"],
+              "query": [
+                {
+                  "key": "eventId",
+                  "value": "event_id_here"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trade Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/trades/stats",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Trade",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/trades/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "trade_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Trade Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/trades/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "trade_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Settle Trades",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"eventId\": \"event_id_here\",\n    \"outcome\": \"yes\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/trades/settle",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades", "settle"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Event Trades",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/trades/event/:eventId?page=1&limit=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["trades", "event", ":eventId"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "eventId",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"test123456\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/register",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.environment.set(\"TOKEN\", jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"test123456\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/auth/me",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Details",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"updateduser\",\n    \"email\": \"updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/updatedetails",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "updatedetails"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currentPassword\": \"test123456\",\n    \"newPassword\": \"newtest123456\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/updatepassword",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "updatepassword"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/forgotpassword",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "forgotpassword"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Settle Event",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"outcome\": \"yes\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/events/:id/settle",
+              "host": ["{{BASE_URL}}"],
+              "path": ["events", ":id", "settle"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Participant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/events/:id/participants",
+              "host": ["{{BASE_URL}}"],
+              "path": ["events", ":id", "participants"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Participant",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/events/:id/participants",
+              "host": ["{{BASE_URL}}"],
+              "path": ["events", ":id", "participants"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    }
+  ]
+}
